@@ -1,5 +1,5 @@
 data "aws_availability_zones" "available" {
- 
+
 }
 
 module "vpc" {
@@ -14,32 +14,32 @@ module "vpc" {
 
 
   azs = var.environment == "dev" || var.environment == "stage" ? local.dev_region : local.prod_region
-  
-  
+
+
   #flatten([
-   # for idx, region in var.regions :
-    #[
-     # for az in data.aws_availability_zones.available[region].names :
-      #var.environment == "dev" || var.environment == "stage" ? [
-       # "${region}${az}a",
-        #"${region}${az}b"
-        #] : [
-        #"${region}${az}a",
-        #"${region}${az}b",
-        #"${region}${az}c"
-      #]
-    #]
+  # for idx, region in var.regions :
+  #[
+  # for az in data.aws_availability_zones.available[region].names :
+  #var.environment == "dev" || var.environment == "stage" ? [
+  # "${region}${az}a",
+  #"${region}${az}b"
+  #] : [
+  #"${region}${az}a",
+  #"${region}${az}b",
+  #"${region}${az}c"
+  #]
+  #]
   #]#)
 
-  
+
   private_subnets = var.environment == "dev" || var.environment == "stage" ? [cidrsubnet(element(var.cidr_block, 0), 3, 0), cidrsubnet(element(var.cidr_block, 0), 3, 1)] : [cidrsubnet(element(var.cidr_block, 0), 3, 3), cidrsubnet(element(var.cidr_block, 0), 3, 1), cidrsubnet(element(var.cidr_block, 0), 3, 2)]
- #azs = var.environment == "dev" ? local.dev_region : local.prod_region
+  #azs = var.environment == "dev" ? local.dev_region : local.prod_region
   #private_subnets = var.environment == "dev" ? [cidrsubnet(var.cidr_block, 3, 0), cidrsubnet(var.cidr_block, 3, 1)] : [cidrsubnet(var.cidr_block, 3, 0), cidrsubnet(var.cidr_block, 3, 1), cidrsubnet(var.cidr_block, 3, 2)]
   #private_subnets = [cidrsubnet(var.cidr_block, 3, 0),cidrsubnet(var.cidr_block, 3, 1)]
   #private_subnet_tags = { tier = private }
   #public_subnets  = var.environment == "dev" ? [cidrsubnet(cidr, 3, 2), cidrsubnet(cidr, 3, 3)] : [cidrsubnet(cidr, 3, 3), cidrsubnet(cidr, 3, 4), cidrsubnet(cidr, 3, 5)]
 
-  
+
 
   public_subnets = var.environment == "dev" || var.environment == "stage" ? [cidrsubnet(element(var.cidr_block, 0), 3, 2), cidrsubnet(element(var.cidr_block, 0), 3, 3)] : [cidrsubnet(element(var.cidr_block, 0), 3, 4), cidrsubnet(element(var.cidr_block, 0), 3, 5), cidrsubnet(element(var.cidr_block, 0), 3, 6)]
 

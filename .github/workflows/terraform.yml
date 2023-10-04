@@ -30,7 +30,7 @@ jobs:
           role-session-name: githubterraform
       
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.5.7
 
