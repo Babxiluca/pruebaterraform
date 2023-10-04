@@ -20,7 +20,7 @@ module "vpc" {
   enable_dns_hostnames          = true
   enable_nat_gateway            = true
   one_nat_gateway_per_az        = true
-  create_igw                    = false
+  create_igw                    = true
   manage_default_security_group = false
 
   tags = {
