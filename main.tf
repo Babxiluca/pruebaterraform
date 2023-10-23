@@ -26,6 +26,7 @@ module "vpc" {
   tags = {
     Terraform   = "true"
     Environment = "dev"
+<<<<<<< HEAD
   }
 }
 
@@ -52,5 +53,7 @@ resource "aws_security_group" "allow_tls" {
 
   tags = {
     Name = "allow_tls"
+=======
+>>>>>>> main
   }
 }
