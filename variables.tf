@@ -12,9 +12,4 @@ variable "region" {
 variable "cidr_block" {
   description = "range of Ips"
   type        = string
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> main
