@@ -4,6 +4,10 @@ on:
     branches:
       - main
   pull_request:
+  workflow_run:
+    workflows: ["Greeting Workflow"]
+    types:
+      - completed
 permissions:
       id-token: write # This is required for aws oidc connection
       contents: read # This is required for actions/checkout
@@ -12,25 +16,13 @@ env:
   TF_LOG: INFO
   AWS_REGION: ${{ secrets.AWS_REGION }}
 jobs:
-  greeting_job:
+  terraform_workflow_run:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
         working-directory: .
     steps:
-      - name: Send greeting
-        run: |
-          echo "Message: ${{ github.event.inputs.message }}"
-      - name: Confirm Apply
-        id: confirm
-        run: |
-          echo "Confirmation: ${{ github.event.inputs.ok }}"
-          echo "Confirmation: ${{ github.event.inputs.ok }}"
-      - name: Finalize
-        if: steps.confirm.outputs.confirmed == 'true'
-        run: echo "Applying the plan"
-
       - name: Git checkout
         uses: actions/checkout@v3
 
@@ -108,7 +100,22 @@ jobs:
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
+      - name: Wait for Confirmation
+        id:  confirmation
+        run: |
+          echo "Waiting for confirmation..."
+          echo "::set-output name=confirmed::false" # Initialize confirmed to false
+          echo "Message: ${{ github.event.workflow_run.event.inputs.message }}"
+          echo "OK Message: ${{ github.event.workflow_run.event.inputs.ok }}"
+          read -p "Confirm (yes/no): " confirmation
+          if [ "$confirmation" == "yes" ]; then
+            echo "::set-output name=confirmed::true"
+          fi
 
-      - name: Terraform Apply
+      - name: Terraform Apply for Workflow Run
+        if: github.event_name == 'workflow_run' && github.event.workflow == 'Greeting Workflow'
+        run: terraform apply -auto-approve -input=false      
+
+      - name: Terraform Apply for push
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
