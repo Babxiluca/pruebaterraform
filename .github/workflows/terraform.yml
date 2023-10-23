@@ -63,7 +63,7 @@ jobs:
           plan_contents: ${{steps.plan.outputs.stdout}}
 
       - name: Wait for approval
-        uses: jbergknoff/github-action-wait-for-terraform-plan-approval@v1
+        uses: github-action-wait-for-terraform-plan-approval@v1
         with:
           command: wait
           plan_id: ${{steps.submit_plan.outputs.plan_id}}
