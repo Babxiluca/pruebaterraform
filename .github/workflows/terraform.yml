@@ -12,13 +12,25 @@ env:
   TF_LOG: INFO
   AWS_REGION: ${{ secrets.AWS_REGION }}
 jobs:
-  deploy:
+  greeting_job:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
         working-directory: .
     steps:
+      - name: Send greeting
+        run: |
+          echo "Message: ${{ github.event.inputs.message }}"
+      - name: Confirm Apply
+        id: confirm
+        run: |
+          echo "Confirmation: ${{ github.event.inputs.ok }}"
+          echo "Confirmation: ${{ github.event.inputs.ok }}"
+      - name: Finalize
+        if: steps.confirm.outputs.confirmed == 'true'
+        run: echo "Applying the plan"
+
       - name: Git checkout
         uses: actions/checkout@v3
 

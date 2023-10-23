@@ -6,10 +6,11 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.64.0"
+      version = ">= 5.19.0"
     }
   }
 }
+
 
 provider "aws" {
   region     = "us-east-1"
@@ -18,19 +19,5 @@ provider "aws" {
 }
 
 locals {
-  dev_region = [
-    "${element(var.regions, 0)}a",
-    "${element(var.regions, 0)}b"
-  ]
-
-  prod_region = var.environment == "prod" ? flatten([
-    for region in var.regions :
-    [
-      for az in data.aws_availability_zones.available[region].names : [
-        "${region}${az}a",
-        "${region}${az}b",
-        "${region}${az}c"
-      ]
-    ]
-  ]) : []
+  availability_zones = ["${var.region}a", "${var.region}b"]
 }

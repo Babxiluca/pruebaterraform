@@ -3,13 +3,14 @@ variable "environment" {
   type        = string
 }
 
-variable "regions" {
-  type        = list(string)
+variable "region" {
+  type        = string
   description = "List of regions for the environment"
 }
 
 
 variable "cidr_block" {
   description = "range of Ips"
-  type        = list(string)
+  type        = string
 }
+
