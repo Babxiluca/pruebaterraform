@@ -52,27 +52,55 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out saved_plan -no-color -var-file=envs/dev.tfvars
+        run: terraform plan -no-color -var-file=envs/dev.tfvars
         if: github.event_name == 'pull_request'
         continue-on-error: true
-      - name: Submit plan for approval
-        uses: jbergknoff/github-action-wait-for-terraform-plan-approval@v1
-        id: submit_plan
+
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          command: submit
-          plan_contents: ${{steps.plan.outputs.stdout}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
 
-      - name: Wait for approval
-        uses: github-action-wait-for-terraform-plan-approval@v1
-        with:
-          command: wait
-          plan_id: ${{steps.submit_plan.outputs.plan_id}}
-          timeout_seconds: 600
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+            </details>
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve save_plan -input=false -var-file=envs/dev.tfvars
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })            
+
+  apply:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: Manual approval
+      id: approval
+      run: echo "Please approve the deployment"
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
