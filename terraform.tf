@@ -6,15 +6,14 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.64.0"
+      version = ">= 5.19.0"
     }
   }
 }
 
+
 provider "aws" {
-  region     = "us-east-1"
-  access_key = "AKIAWKTWSO4ODMRLUYXJ"
-  secret_key = "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"
+  region = "us-west-2"
 }
 
 locals {
