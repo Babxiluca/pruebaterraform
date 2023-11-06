@@ -102,6 +102,10 @@ jobs:
   apply:
     name: deploy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
     needs: plan
     steps:
       - uses:  trstringer/manual-approval@v1
