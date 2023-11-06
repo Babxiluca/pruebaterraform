@@ -106,7 +106,6 @@ jobs:
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
           approvers: Cafc79,Babxiluca
-          minimum-approvals: 1
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
