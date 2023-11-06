@@ -1,9 +1,8 @@
 name: "deploy infra"
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
   pull_request:    
 permissions:
       id-token: write # This is required for aws oidc connection
@@ -108,8 +107,6 @@ jobs:
         working-directory: .
     needs: plan
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
       - uses:  trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
