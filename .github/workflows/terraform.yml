@@ -98,17 +98,16 @@ jobs:
         run: exit 1
 
   apply:
+    name: deploy
     runs-on: ubuntu-latest
     needs: plan
     steps:
-    - name: Manual approval
-      id: approval
-      uses:  trstringer/manual-approval@v1
-      with:
-        secret: ${{ secrets.GITHUB_TOKEN }}
-        approvers: Cafc79
-        minimum-approvals: 1
+      - uses:  trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: Cafc79,Babxiluca
+          minimum-approvals: 1
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
