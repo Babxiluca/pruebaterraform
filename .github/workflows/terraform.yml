@@ -112,9 +112,33 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: Cafc79,Babxiluca
           minimum-approvals: 1
-          issue-title: "Deploying v1.0.0 to prod"
-          issue-body: "Review the terraform plan, then approve or deny the deployment of v1.0.0 to prod."
+          issue-title: "Deploying terraform to stage environment"
+          issue-body: "Review the terraform plan, then approve or deny the deployment to right environment."
+      
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: githubterraform
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: 1.5.7
+  
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        
 
+      - name: Terraform Init
+        id: init
+        env:
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
+        run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
