@@ -1,9 +1,10 @@
-name: "Terraform action"
+name: "deploy infra"
 on:
   push:
     branches:
       - main
-  pull_request:
+  pull_request: 
+  workflow_dispatch:  
 permissions:
       id-token: write # This is required for aws oidc connection
       contents: read # This is required for actions/checkout
@@ -12,7 +13,7 @@ env:
   TF_LOG: INFO
   AWS_REGION: ${{ secrets.AWS_REGION }}
 jobs:
-  deploy:
+  plan:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -93,14 +94,20 @@ jobs:
               body: output
             })            
 
-  apply:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-    - name: Manual approval
-      id: approval
-      run: echo "Please approve the deployment"
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
+  apply:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: plan
+    steps:
+      - uses:  trstringer/manual-approval@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          approvers: Cafc79,Babxiluca
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var-file=envs/dev.tfvars
