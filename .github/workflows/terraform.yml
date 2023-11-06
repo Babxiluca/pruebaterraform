@@ -104,7 +104,7 @@ jobs:
     steps:
       - uses:  trstringer/manual-approval@v1
         with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
+          secret: ${{ github.TOKEN }}
           approvers: Cafc79,Babxiluca
 
       - name: Terraform Apply
