@@ -1,8 +1,11 @@
 name: "deploy infra"
 on:
+  pull_request:
+    branches:
+      - main
   push:
-    branches: [ main ]
-  pull_request:     
+    branches:
+      - main
 permissions:
       id-token: write # This is required for aws oidc connection
       contents: read # This is required for actions/checkout
@@ -53,11 +56,11 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -var-file=envs/dev.tfvars
-        if: github.event_name == 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
         continue-on-error: true
 
       - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
