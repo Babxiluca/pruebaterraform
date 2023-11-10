@@ -4,12 +4,12 @@ on:
     branches:
       - main
     paths:
-      - IaC/dev-environment
+      - "IaC/dev-environment"
   push:
     branches:
       - main
     paths:
-      - IaC/dev-environment
+      - "IaC/dev-environment"
 permissions:
       id-token: write # This is required for aws oidc connection
       contents: read # This is required for actions/checkout
@@ -24,7 +24,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: IaC/dev-environment
+        working-directory: .
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
