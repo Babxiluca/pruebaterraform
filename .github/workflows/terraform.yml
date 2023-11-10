@@ -1,9 +1,9 @@
 name: "deploy infra"
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request_target: 
+  push:
     branches:
       - main
 permissions:
