@@ -11,7 +11,7 @@ module "vpc" {
 
 
   azs                 = local.availability_zones
-  private_subnets     = [cidrsubnet(var.cidr_block, 4, 0), cidrsubnet(var.cidr_block, 3, 1)]
+  private_subnets     = [cidrsubnet(var.cidr_block, 3, 0), cidrsubnet(var.cidr_block, 3, 1)]
   private_subnet_tags = { Name = "private" }
   public_subnets      = [cidrsubnet(var.cidr_block, 3, 3), cidrsubnet(var.cidr_block, 3, 4)]
   public_subnet_tags  = { Name = "public" }
